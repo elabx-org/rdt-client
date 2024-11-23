@@ -12,8 +12,9 @@ permissions:
 env:
   APP_NAME: rdtclient
   DOCKER_FILE: ./Dockerfile
-  DOCKER_PLATFORMS: "linux/arm64/v8,linux/amd64"
-  ENABLE_DOCKERHUB: 1
+  # DOCKER_PLATFORMS: "linux/arm64/v8,linux/amd64"
+  DOCKER_PLATFORMS: "linux/amd64"  
+  ENABLE_DOCKERHUB: 0
   ENABLE_GHCR: 1
   
 jobs:
@@ -90,12 +91,12 @@ jobs:
     #       a web interface to manage your torrents on Real-Debrid, AllDebrid or Premiumize.
     #     readme-filepath: ./README-DOCKER.md
     
-    - name: Github Registry Description
-      if: ${{ env.ENABLE_GHCR == 1 }}
-      uses: peter-evans/dockerhub-description@v3.3.0
-      with:
-        username: ${{ github.repository_owner }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-        short-description: |
-          A web interface to manage your torrents on Real-Debrid, AllDebrid or Premiumize.
-        readme-filepath: ./README-DOCKER.md
+    # - name: Github Registry Description
+    #   if: ${{ env.ENABLE_GHCR == 1 }}
+    #   uses: peter-evans/dockerhub-description@v3.3.0
+    #   with:
+    #     username: ${{ github.repository_owner }}
+    #     password: ${{ secrets.GITHUB_TOKEN }}
+    #     short-description: |
+    #       A web interface to manage your torrents on Real-Debrid, AllDebrid or Premiumize.
+    #     readme-filepath: ./README-DOCKER.md
