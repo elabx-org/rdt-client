@@ -27,15 +27,18 @@ ENV TARGETPLATFORM=${TARGETPLATFORM:-linux/amd64}
 ARG BUILDPLATFORM
 ENV BUILDPLATFORM=${BUILDPLATFORM:-linux/amd64}
 
-RUN mkdir /appserver
 WORKDIR /appserver
 
-RUN \
-   echo "**** Cloning Source Code ****" && \
-   git clone https://github.com/elabx-org/rdt-client.git . && \
-   echo "**** Building Source Code for $TARGETPLATFORM on $BUILDPLATFORM ****" && \
-   cd server && \
-   dotnet restore --no-cache RdtClient.sln && dotnet publish --no-restore -c Release -o out ; 
+RUN set -e && \
+    echo "**** Cloning Source Code ****" && \
+    git clone https://github.com/elabx-org/rdt-client.git /tmp/source && \
+    cp -r /tmp/source/. . && \
+    rm -rf /tmp/source && \
+    echo "**** Building Source Code for $TARGETPLATFORM on $BUILDPLATFORM ****" && \
+    cd server && \
+    dotnet restore --no-cache RdtClient.sln && \
+    dotnet publish --no-restore -c Release -o out
+
 
 # Stage 3 - Build runtime image
 FROM ghcr.io/linuxserver/baseimage-alpine:3.20
