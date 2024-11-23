@@ -75,8 +75,6 @@ jobs:
         platforms: ${{ env.DOCKER_PLATFORMS }}
         push: ${{ github.event_name != 'pull_request' }}
         tags: |
-          ${{ github.repository_owner }}/rdtclient:main
-          ${{ github.repository_owner }}/rdtclient:sha-${{ github.sha }}
           ghcr.io/${{ github.repository_owner }}/rdtclient:main
           ghcr.io/${{ github.repository_owner }}/rdtclient:sha-${{ github.sha }}
         labels: ${{ steps.meta.outputs.labels }}
