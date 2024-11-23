@@ -21,27 +21,21 @@ RUN \
 RUN ls -FCla /appclient/root
 
 # Stage 2 - Build the backend
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS dotnet-build-env
+FROM mcr.microsoft.com/dotnet/sdk:9.0-bookworm-slim-amd64 AS dotnet-build-env
 ARG TARGETPLATFORM
 ENV TARGETPLATFORM=${TARGETPLATFORM:-linux/amd64}
 ARG BUILDPLATFORM
 ENV BUILDPLATFORM=${BUILDPLATFORM:-linux/amd64}
 
+RUN mkdir /appserver
 WORKDIR /appserver
 
-# Copy source instead of git clone
-COPY . .
-
-# Build projects in correct order
-RUN set -e && \
-    echo "**** Building Source Code for $TARGETPLATFORM on $BUILDPLATFORM ****" && \
-    cd server && \
-    # Build Data project first
-    dotnet restore RdtClient.Data/RdtClient.Data.csproj && \
-    dotnet build RdtClient.Data/RdtClient.Data.csproj && \
-    # Then restore and build full solution
-    dotnet restore RdtClient.sln && \
-    dotnet publish RdtClient.sln -c Release -o out
+RUN \
+   echo "**** Cloning Source Code ****" && \
+   git clone https://github.com/elabx-org/rdt-client.git . && \
+   echo "**** Building Source Code for $TARGETPLATFORM on $BUILDPLATFORM ****" && \
+   cd server && \
+   dotnet restore --no-cache RdtClient.sln && dotnet publish --no-restore -c Release -o out ; 
 
 # Stage 3 - Build runtime image
 FROM ghcr.io/linuxserver/baseimage-alpine:3.20

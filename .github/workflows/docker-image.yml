@@ -4,7 +4,6 @@ on:
   push:
     tags:
       - v*
-  workflow_dispatch:  # Allows manual triggering      
 
 permissions: 
   packages: write
@@ -13,7 +12,6 @@ env:
   APP_NAME: rdtclient
   DOCKER_FILE: ./Dockerfile
   DOCKER_PLATFORMS: "linux/arm64/v8,linux/amd64"
-  # DOCKER_PLATFORMS: "linux/amd64"  
   ENABLE_DOCKERHUB: 0
   ENABLE_GHCR: 1
   
@@ -53,12 +51,12 @@ jobs:
       with:
         buildkitd-flags: --debug
     
-    # - name: Docker Login
-    #   if: ${{ github.event_name != 'pull_request' && env.ENABLE_DOCKERHUB == 1 }}
-    #   uses: docker/login-action@v2.1.0
-    #   with:
-    #     username: ${{ secrets.DOCKERHUB_USERNAME }}
-    #     password: ${{ secrets.DOCKERHUB_TOKEN }}
+    - name: Docker Login
+      if: ${{ github.event_name != 'pull_request' && env.ENABLE_DOCKERHUB == 1 }}
+      uses: docker/login-action@v2.1.0
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
         
     - name: Login to GHCR
       if: ${{ github.event_name != 'pull_request' && env.ENABLE_GHCR == 1 }}
@@ -75,21 +73,19 @@ jobs:
         file: ${{ env.DOCKER_FILE }}
         platforms: ${{ env.DOCKER_PLATFORMS }}
         push: ${{ github.event_name != 'pull_request' }}
-        tags: |
-          ghcr.io/${{ github.repository_owner }}/rdtclient:main
-          ghcr.io/${{ github.repository_owner }}/rdtclient:sha-${{ github.sha }}
+        tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
 
-    # - name: Docker Hub Registry Description
-    #   if: ${{ env.ENABLE_DOCKERHUB == 1 }}
-    #   uses: peter-evans/dockerhub-description@v3.3.0
-    #   with:
-    #     username: ${{ secrets.DOCKERHUB_USERNAME }}
-    #     password: ${{ secrets.DOCKERHUB_TOKEN }}
-    #     repository: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.APP_NAME }}
-    #     short-description: |
-    #       a web interface to manage your torrents on Real-Debrid, AllDebrid or Premiumize.
-    #     readme-filepath: ./README-DOCKER.md
+    - name: Docker Hub Registry Description
+      if: ${{ env.ENABLE_DOCKERHUB == 1 }}
+      uses: peter-evans/dockerhub-description@v3.3.0
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.APP_NAME }}
+        short-description: |
+          a web interface to manage your torrents on Real-Debrid, AllDebrid or Premiumize.
+        readme-filepath: ./README-DOCKER.md
     
     # - name: Github Registry Description
     #   if: ${{ env.ENABLE_GHCR == 1 }}
