@@ -74,8 +74,7 @@ jobs:
         file: ${{ env.DOCKER_FILE }}
         platforms: ${{ env.DOCKER_PLATFORMS }}
         push: ${{ github.event_name != 'pull_request' }}
-        tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
+        tags: ghcr.io/${{ github.repository_owner }}/${{ env.APP_NAME }}:latest
 
     - name: Docker Hub Registry Description
       if: ${{ env.ENABLE_DOCKERHUB == 1 }}
